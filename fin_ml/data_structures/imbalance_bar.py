@@ -28,17 +28,16 @@ def _get_exp_num_ticks(num_ticks_bar:list, num_prev_bars:int, min_max:list):
     return min(max(exp_num_ticks, _min), _max)
 
 
-def run(df:pd.DataFrame, expected_imbalance_window:int=100, num_prev_bars:int=3, expected_num_ticks:int=100, expected_num_ticks_min_max:list=[20, 200])->list:
+def run(df:pd.DataFrame, expected_imbalance_window:int=100, num_prev_bars:int=3, expected_num_ticks:int=100, expected_num_ticks_min_max:list=[20, 200])->pd.DataFrame:
     """불균형바를 구한다
-    df: 틱 데이터의 pandas.DataFrame 객체 입력
+    df:                                   틱 데이터의 pandas.DataFrame 객체 입력
+    expected_imbalance_window:            기대 불균형의 최대 윈도우 크기
+    num_prev_bars:                        E[T]의 지수가중평균을 구할 때의 window 및 span 크기
+    expected_num_ticks:
+    expected_num_ticks_min_max:           제한을 두지 않을 경우는 [0, np.inf]로 설정
     """
+
     print('(*) imbalance bar를 생성합니다.')
-    
-    # parameter - 기댓값이 작을수록 많은 bar 추출
-    # expected_imbalance_window = 100             # 기대 불균형의 최대 윈도우 크기
-    # num_prev_bars = 3                          # E[T]의 지수가중평균을 구할 때의 window 및 span 크기
-    # expected_num_ticks = 100
-    # expected_num_ticks_min_max = [20, 200]      # 제한을 두지 않을 경우는 [0, np.inf]로 설정
     
     # 바 추출 이후 초기화 되지 않을 변수들
     signs = []
@@ -65,7 +64,6 @@ def run(df:pd.DataFrame, expected_imbalance_window:int=100, num_prev_bars:int=3,
         if price > price_high: price_high = price       # high
         if price < price_low: price_low = price         # low
         price_close = price                             # close
-        # print(price_open, price_high, price_low, price_close)
         
         ## 누적 tick / dollar / volume
         cum_tick += 1
@@ -94,9 +92,8 @@ def run(df:pd.DataFrame, expected_imbalance_window:int=100, num_prev_bars:int=3,
             expected_imbalance = _get_expected_imbalance(signs, expected_num_ticks, expected_imbalance_window)
         
         ############# bar 추출 #############
-        if (np.abs(cum_theta) > expected_num_ticks * np.abs(expected_imbalance) if expected_imbalance is not None else 0):
+        if (np.abs(cum_theta) > expected_num_ticks * np.abs(expected_imbalance) if expected_imbalance is not None else False):
             #### bar 생성 ####
-            # print(f"""{np.abs(cum_theta)}/{expected_num_ticks}/{ np.abs(expected_imbalance)}/{expected_imbalance}""")
             bar_info = dict(date_time=date_time, tick_num=tick_num, open=price_open, high= price_high, low=price_low, close=price_close, 
             cum_vol=cum_volume, cum_dallar=cum_dollar)
             print(f'{tick_num}/{sample_size}\t{bar_info}')
@@ -104,8 +101,8 @@ def run(df:pd.DataFrame, expected_imbalance_window:int=100, num_prev_bars:int=3,
             num_ticks_bar.append(cum_tick)
 
             #### 기존 값 초기화 ####
-            expected_num_ticks = _get_exp_num_ticks(num_ticks_bar, num_prev_bars, expected_num_ticks_min_max)
-            expected_imbalance = _get_expected_imbalance(signs, expected_num_ticks, expected_imbalance_window)
+            expected_num_ticks = _get_exp_num_ticks(num_ticks_bar, num_prev_bars, expected_num_ticks_min_max)           # E[T]의 기대 크기
+            expected_imbalance = _get_expected_imbalance(signs, expected_num_ticks, expected_imbalance_window)          # 기대 불균형
 
             # 바 추출 이후 초기화될 변수들
             price_open = price_close = None
@@ -113,6 +110,7 @@ def run(df:pd.DataFrame, expected_imbalance_window:int=100, num_prev_bars:int=3,
             cum_theta = cum_tick = cum_dollar = cum_volume = 0
     
     df = pd.DataFrame(list_bars)
+    df['date_time'] = pd.to_datetime(df['date_time'])
     return df
 
     
