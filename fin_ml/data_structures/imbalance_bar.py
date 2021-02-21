@@ -90,7 +90,7 @@ def run(df:pd.DataFrame, expected_imbalance_window:int=20, num_prev_bars:int=3,
         bar.update(tick_num)
         date_time = _date_time = d[0]
         # 해상도가 초단위이기 때문에 추후 일일 변동성 구할 때 중복된 값이 추출될 수 있음
-        # 단위 시간 애 중복이 있는 경우 tick 순서대로 microsecond 단위로 유니크한 값을 기록하도록 함
+        # 단위 시간 내 중복이 있는 경우 tick 순서대로 microsecond 단위로 유니크한 값을 기록하도록 함
         if prv_date_time == _date_time:
             same_time_idx += 1
             date_time += '.{:06d}'.format(same_time_idx)
