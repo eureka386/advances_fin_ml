@@ -3,3 +3,6 @@
 .vscode/*
 venv/*
 **/data_samples/*.csv
+*.pickle
+*.png
+**/*.csv
