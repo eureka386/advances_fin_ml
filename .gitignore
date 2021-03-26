@@ -6,3 +6,6 @@ venv/*
 *.pickle
 *.png
 **/*.csv
+fin_ml/tests/*
+test.py
+.gitignore
