@@ -59,7 +59,6 @@ def run(df:pd.DataFrame, expected_imbalance_window:int=20, num_prev_bars:int=3,
     print(f'(*) {run_type} imbalance bar를 생성합니다.')
     
     # 바 추출 타입 체크
-    # assert run_type in ('tick', 'volume', 'dollar'), 'wrong run_type'
     _run_type = ('tick', 'volume', 'dollar').index(run_type)
 
     # 바 추출 이후 초기화 되지 않을 변수들
