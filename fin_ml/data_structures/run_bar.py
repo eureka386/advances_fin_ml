@@ -271,7 +271,6 @@ def run(df:pd.DataFrame, expected_imbalance_window:int=100, num_prev_bars:int=10
         elif _run_type == 2:     # dollar type
             imbalance = _sign * dollar
         
-        
         if imbalance > 0:
             cum_theta_buy += imbalance
             buy_tick_num += 1
@@ -325,7 +324,7 @@ def run(df:pd.DataFrame, expected_imbalance_window:int=100, num_prev_bars:int=10
             exp_buy_ticks_proportion = ewm_mean(buy_ticks_proportion[-num_prev_bars:], num_prev_bars)[-1]
             exp_sell_ticks_proportion = (1 - exp_buy_ticks_proportion)
 
-            #### 기존 값 초기화 ####
+            #### 기대값 계산 ####
             expected_num_ticks = _get_exp_num_ticks(num_ticks_bar, num_prev_bars, expected_num_ticks_min_max)                   # E[T]의 기대 크기
             expected_imbalance_buy = _get_expected_imbalance(signs_buy, expected_num_ticks, expected_imbalance_window)          # 기대 불균형
             expected_imbalance_sell = _get_expected_imbalance(signs_sell, expected_num_ticks, expected_imbalance_window)        # 기대 불균형
